@@ -17,6 +17,14 @@ repositories {
 
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter'
+
+	// Dependencias básicas de Eclipse Milo
+	implementation group: 'org.eclipse.milo', name: 'sdk-client', version: '0.6.11'
+	implementation group: 'org.eclipse.milo', name: 'sdk-server', version: '0.6.11'
+	implementation group: 'org.eclipse.milo', name: 'stack-core', version: '0.6.11'
+	implementation group: 'org.eclipse.milo', name: 'stack-client', version: '0.6.11'
+	implementation group: 'org.eclipse.milo', name: 'stack-server', version: '0.6.11'
+
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
