@@ -16,6 +16,7 @@ import org.eclipse.milo.opcua.stack.core.types.enumerated.TimestampsToReturn;
 import org.eclipse.milo.opcua.stack.core.types.structured.MonitoredItemCreateRequest;
 import org.eclipse.milo.opcua.stack.core.types.structured.MonitoringParameters;
 import org.eclipse.milo.opcua.stack.core.types.structured.ReadValueId;
+import org.springframework.stereotype.Component;
 
 import java.io.FileWriter;
 import java.io.Serializable;
@@ -24,7 +25,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import static org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.Unsigned.uint;
-
+@Component
 public abstract class AbstractOpcNode implements Serializable {
     protected String endPointUrl;
     protected Double samplingIntervalMs;
