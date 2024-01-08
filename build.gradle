@@ -26,6 +26,7 @@ dependencies {
 	implementation group: 'org.eclipse.milo', name: 'stack-core', version: '0.6.11'
 	implementation group: 'org.eclipse.milo', name: 'stack-client', version: '0.6.11'
 	implementation group: 'org.eclipse.milo', name: 'stack-server', version: '0.6.11'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }

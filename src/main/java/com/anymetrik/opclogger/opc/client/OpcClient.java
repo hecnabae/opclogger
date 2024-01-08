@@ -2,6 +2,9 @@ package com.anymetrik.opclogger.opc.client;
 
 import com.anymetrik.opclogger.opc.node.AbstractOpcNode;
 import com.anymetrik.opclogger.opc.node.OpcNodeFactory;
+import com.anymetrik.opclogger.opc.subscriptions.IOpcSubscription;
+import com.anymetrik.opclogger.opc.subscriptions.OpcSubscription;
+import com.anymetrik.opclogger.service.MeasureService;
 import org.eclipse.milo.opcua.sdk.client.OpcUaClient;
 import org.eclipse.milo.opcua.sdk.client.api.UaClient;
 import org.eclipse.milo.opcua.stack.core.security.SecurityPolicy;
@@ -14,6 +17,7 @@ public class OpcClient implements Serializable {
     private OpcUaClient opcUaClient;
     private UaClient uaClient;
     private String serverEndpoint;
+    private MeasureService measureService;
 
     private HashMap<String, AbstractOpcNode> nodes;
 
@@ -41,6 +45,14 @@ public class OpcClient implements Serializable {
         this.serverEndpoint = serverEndpoint;
     }
 
+    public MeasureService getMeasureService() {
+        return measureService;
+    }
+
+    public void setMeasureService(MeasureService measureService) {
+        this.measureService = measureService;
+    }
+
     public HashMap<String, AbstractOpcNode> getNodes() {
         return nodes;
     }
@@ -49,9 +61,10 @@ public class OpcClient implements Serializable {
         this.nodes = nodes;
     }
 
-    public OpcClient(String serverEndpoint) {
+    public OpcClient(String serverEndpoint, MeasureService measureService) {
         this.serverEndpoint = serverEndpoint;
         this.nodes = new HashMap<>();
+        this.measureService = measureService;
     }
 
     public void connect() throws Exception {
@@ -90,13 +103,14 @@ public class OpcClient implements Serializable {
         }
     }
 
-    public void subscribeBasicNode(String nodeEndPoint, Double samplingInterval) throws Exception {
+    public void subscribeBasicNode(String nodeEndPoint, Double samplingInterval, MeasureService measureService) throws Exception {
         AbstractOpcNode basicNode = this.nodes.get(nodeEndPoint);
         if (basicNode == null) {
-            basicNode = OpcNodeFactory.createNode(nodeEndPoint, samplingInterval, "basic", new ArrayList<>());
+            IOpcSubscription subscription = new OpcSubscription(measureService);
+            basicNode = OpcNodeFactory.createNode(nodeEndPoint, samplingInterval, "basic", subscription, new ArrayList<>());
             this.nodes.put(nodeEndPoint, basicNode);
         }
-        if (basicNode != null && basicNode.getUaSubscription() != null) {
+        if (basicNode != null && basicNode.getUaSubscription() == null) {
             basicNode.subscribe(this.opcUaClient);
         }
     }

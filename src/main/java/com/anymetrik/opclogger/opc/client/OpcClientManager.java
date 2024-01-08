@@ -1,11 +1,19 @@
 package com.anymetrik.opclogger.opc.client;
 
+import com.anymetrik.opclogger.service.MeasureService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import java.util.HashMap;
 
+@Service
 public class OpcClientManager {
     private static OpcClientManager instance;
     private OpcClientFactory opcClientFactory;
     private HashMap<String, OpcClient> opcClients;
+
+    @Autowired
+    private MeasureService measureService;
 
     public OpcClientFactory getOpcClientFactory() {
         return opcClientFactory;
@@ -23,6 +31,14 @@ public class OpcClientManager {
         this.opcClients = opcClients;
     }
 
+    public MeasureService getMeasureService() {
+        return measureService;
+    }
+
+    public void setMeasureService(MeasureService measureService) {
+        this.measureService = measureService;
+    }
+
     public static OpcClientManager getInstance() {
         if (instance == null) {
             instance = new OpcClientManager();
@@ -31,7 +47,8 @@ public class OpcClientManager {
     }
 
     private OpcClientManager() {
-
+        this.opcClientFactory = new OpcClientFactory();
+        this.opcClients = new HashMap<>();
     }
 
 
@@ -42,7 +59,7 @@ public class OpcClientManager {
     }
 
     public OpcClient createOpcClient(String serverEndPoint) throws Exception {
-        OpcClient opcClient = this.opcClientFactory.createNewOpcClient(serverEndPoint);
+        OpcClient opcClient = this.opcClientFactory.createNewOpcClient(serverEndPoint, this.measureService);
         opcClient.connect();
         this.opcClients.put(serverEndPoint, opcClient);
         return opcClient;
@@ -54,7 +71,7 @@ public class OpcClientManager {
             // error
             return;
         } else {
-            opcClient.subscribeBasicNode(nodeEndPoint, samplingInterval);
+            opcClient.subscribeBasicNode(nodeEndPoint, samplingInterval, measureService);
         }
     }
 }

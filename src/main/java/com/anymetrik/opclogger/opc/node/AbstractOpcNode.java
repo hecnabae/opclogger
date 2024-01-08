@@ -1,13 +1,10 @@
 package com.anymetrik.opclogger.opc.node;
 
-import com.anymetrik.opclogger.opc.client.OpcClient;
-import com.google.common.collect.ImmutableList;
-import org.bouncycastle.pqc.crypto.ExhaustedPrivateKeyException;
+import com.anymetrik.opclogger.opc.subscriptions.IOpcSubscription;
 import org.eclipse.milo.opcua.sdk.client.OpcUaClient;
 import org.eclipse.milo.opcua.sdk.client.api.subscriptions.UaMonitoredItem;
 import org.eclipse.milo.opcua.sdk.client.api.subscriptions.UaSubscription;
 import org.eclipse.milo.opcua.stack.core.AttributeId;
-import org.eclipse.milo.opcua.stack.core.types.builtin.DataValue;
 import org.eclipse.milo.opcua.stack.core.types.builtin.NodeId;
 import org.eclipse.milo.opcua.stack.core.types.builtin.QualifiedName;
 import org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.UInteger;
@@ -16,20 +13,21 @@ import org.eclipse.milo.opcua.stack.core.types.enumerated.TimestampsToReturn;
 import org.eclipse.milo.opcua.stack.core.types.structured.MonitoredItemCreateRequest;
 import org.eclipse.milo.opcua.stack.core.types.structured.MonitoringParameters;
 import org.eclipse.milo.opcua.stack.core.types.structured.ReadValueId;
-import org.springframework.stereotype.Component;
+import org.springframework.beans.factory.annotation.Autowired;
 
-import java.io.FileWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
 import static org.eclipse.milo.opcua.stack.core.types.builtin.unsigned.Unsigned.uint;
-@Component
+
+
 public abstract class AbstractOpcNode implements Serializable {
     protected String endPointUrl;
     protected Double samplingIntervalMs;
     private UaSubscription uaSubscription;
+    private IOpcSubscription subscription;
 
     public String getEndPointUrl() {
         return endPointUrl;
@@ -55,9 +53,11 @@ public abstract class AbstractOpcNode implements Serializable {
         this.uaSubscription = uaSubscription;
     }
 
-    public AbstractOpcNode(String endPointUrl, Double samplingIntervalMs) {
+    @Autowired
+    public AbstractOpcNode(String endPointUrl, Double samplingIntervalMs, IOpcSubscription subscription) {
         this.endPointUrl = endPointUrl;
         this.samplingIntervalMs = samplingIntervalMs;
+        this.subscription = subscription;
     }
 
     public void subscribe(OpcUaClient opcUaClient) throws Exception {
@@ -99,7 +99,7 @@ public abstract class AbstractOpcNode implements Serializable {
         // value/event consumer hooked up. The alternative is to create the item in sampling mode, hook up the
         // consumer after the creation call completes, and then change the mode for all items to reporting.
         UaSubscription.ItemCreationCallback onItemCreated =
-                (item, id) -> item.setValueConsumer(this::onSubscriptionValue);
+                (item, id) -> item.setValueConsumer(subscription);
 
         List<UaMonitoredItem> items = this.uaSubscription.createMonitoredItems(
                 TimestampsToReturn.Both,
@@ -130,7 +130,5 @@ public abstract class AbstractOpcNode implements Serializable {
         opcUaClient.getSubscriptionManager().deleteSubscription(this.uaSubscription.getSubscriptionId());
         this.uaSubscription = null;
     }
-
-    public abstract void onSubscriptionValue(UaMonitoredItem item, DataValue value);
 }
 

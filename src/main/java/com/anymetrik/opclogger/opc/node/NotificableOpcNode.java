@@ -1,22 +1,22 @@
 package com.anymetrik.opclogger.opc.node;
 
+import com.anymetrik.opclogger.opc.subscriptions.IOpcSubscription;
 import org.eclipse.milo.opcua.sdk.client.api.subscriptions.UaMonitoredItem;
 import org.eclipse.milo.opcua.stack.core.types.builtin.DataValue;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 public class NotificableOpcNode extends AbstractOpcNode {
     private List<String> channels;
 
-    public NotificableOpcNode(String endPointUrl, Double samplingIntervalMs) {
-        super(endPointUrl, samplingIntervalMs);
+    public NotificableOpcNode(String endPointUrl, Double samplingIntervalMs, IOpcSubscription subscription) {
+        super(endPointUrl, samplingIntervalMs, subscription);
         this.channels = new ArrayList<>();
     }
 
-    public NotificableOpcNode(String endPointUrl, Double samplingIntervalMs, List<String> channels) {
-        super(endPointUrl, samplingIntervalMs);
+    public NotificableOpcNode(String endPointUrl, Double samplingIntervalMs, IOpcSubscription subscription, List<String> channels) {
+        super(endPointUrl, samplingIntervalMs, subscription);
         this.channels = channels;
     }
 
@@ -28,7 +28,7 @@ public class NotificableOpcNode extends AbstractOpcNode {
         this.channels = channels;
     }
 
-    @Override
+    // @Override
     public void onSubscriptionValue(UaMonitoredItem item, DataValue value) {
         // Push data on channels
 
