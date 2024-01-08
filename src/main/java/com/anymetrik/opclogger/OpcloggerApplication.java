@@ -11,7 +11,7 @@ public class OpcloggerApplication {
     public static void main(String[] args) {
         SpringApplication.run(OpcloggerApplication.class, args);
         // Suscribir servidor opc
-        OpcClientManager clientManager = new OpcClientManager();
+        OpcClientManager clientManager = OpcClientManager.getInstance();
         try {
             clientManager.initOpcClients();
         } catch (Exception e) {

@@ -54,7 +54,7 @@ public class OpcClient implements Serializable {
         this.nodes = new HashMap<>();
     }
 
-    public void connect(String serverEndpoint) throws Exception {
+    public void connect() throws Exception {
         // Crea un cliente OPC UA
         opcUaClient = OpcUaClient.create(
                 serverEndpoint,

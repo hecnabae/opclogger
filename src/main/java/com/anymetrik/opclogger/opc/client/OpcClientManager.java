@@ -1,10 +1,9 @@
 package com.anymetrik.opclogger.opc.client;
 
-import com.anymetrik.opclogger.opc.node.OpcNodeFactory;
-
 import java.util.HashMap;
 
 public class OpcClientManager {
+    private static OpcClientManager instance;
     private OpcClientFactory opcClientFactory;
     private HashMap<String, OpcClient> opcClients;
 
@@ -24,15 +23,29 @@ public class OpcClientManager {
         this.opcClients = opcClients;
     }
 
+    public static OpcClientManager getInstance() {
+        if (instance == null) {
+            instance = new OpcClientManager();
+        }
+        return instance;
+    }
+
+    private OpcClientManager() {
+
+    }
+
+
     public void initOpcClients() throws Exception {
         String serverEndPoint = "opc.tcp://127.0.0.1:49320";
         // REcorrer datos para crear clientes opc
         this.createOpcClient(serverEndPoint);
     }
 
-    private void createOpcClient(String serverEndPoint) throws Exception {
+    public OpcClient createOpcClient(String serverEndPoint) throws Exception {
         OpcClient opcClient = this.opcClientFactory.createNewOpcClient(serverEndPoint);
+        opcClient.connect();
         this.opcClients.put(serverEndPoint, opcClient);
+        return opcClient;
     }
 
     public void subscribeNode(String serverEndPoint, String nodeEndPoint, Double samplingInterval) throws Exception {
