@@ -5,6 +5,7 @@ import org.eclipse.milo.opcua.stack.core.types.builtin.DataValue;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class NotificableOpcNode extends AbstractOpcNode {
     private List<String> channels;
@@ -30,5 +31,6 @@ public class NotificableOpcNode extends AbstractOpcNode {
     @Override
     public void onSubscriptionValue(UaMonitoredItem item, DataValue value) {
         // Push data on channels
+
     }
 }
