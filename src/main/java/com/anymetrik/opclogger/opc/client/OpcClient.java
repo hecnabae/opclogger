@@ -106,7 +106,7 @@ public class OpcClient implements Serializable {
     public void subscribeBasicNode(String nodeEndPoint, Double samplingInterval, MeasureService measureService) throws Exception {
         AbstractOpcNode basicNode = this.nodes.get(nodeEndPoint);
         if (basicNode == null) {
-            IOpcSubscription subscription = new OpcSubscription(measureService);
+            IOpcSubscription subscription = new OpcSubscription(measureService, basicNode);
             basicNode = OpcNodeFactory.createNode(nodeEndPoint, samplingInterval, "basic", subscription, new ArrayList<>());
             this.nodes.put(nodeEndPoint, basicNode);
         }

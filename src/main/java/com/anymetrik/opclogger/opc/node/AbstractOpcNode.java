@@ -53,7 +53,6 @@ public abstract class AbstractOpcNode implements Serializable {
         this.uaSubscription = uaSubscription;
     }
 
-    @Autowired
     public AbstractOpcNode(String endPointUrl, Double samplingIntervalMs, IOpcSubscription subscription) {
         this.endPointUrl = endPointUrl;
         this.samplingIntervalMs = samplingIntervalMs;

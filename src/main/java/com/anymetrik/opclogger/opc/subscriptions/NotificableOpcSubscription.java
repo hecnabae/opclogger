@@ -1,5 +1,6 @@
 package com.anymetrik.opclogger.opc.subscriptions;
 
+import com.anymetrik.opclogger.messaging.MessagePublisher;
 import com.anymetrik.opclogger.model.Measure;
 import com.anymetrik.opclogger.opc.node.AbstractOpcNode;
 import com.anymetrik.opclogger.service.MeasureService;
@@ -12,8 +13,10 @@ import org.eclipse.milo.opcua.stack.core.types.builtin.NodeId;
 import java.time.Instant;
 import java.util.logging.Logger;
 
-public class OpcSubscription implements IOpcSubscription {
+public class NotificableOpcSubscription implements IOpcSubscription {
     private MeasureService measureService;
+
+    private MessagePublisher messagePublisher;
 
     private AbstractOpcNode opcNode;
 
@@ -25,14 +28,16 @@ public class OpcSubscription implements IOpcSubscription {
         this.opcNode = opcNode;
     }
 
-    public OpcSubscription(MeasureService measureService, AbstractOpcNode opcNode) {
+    public NotificableOpcSubscription(MeasureService measureService, MessagePublisher messagePublisher, AbstractOpcNode opcNode) {
         this.measureService = measureService;
+        this.messagePublisher = messagePublisher;
         this.opcNode = opcNode;
     }
 
     @Override
     public void onSubscriptionValue(UaMonitoredItem item, DataValue value) {
-        Logger.getLogger(this.getClass().getName()).info("subscription value received: item={" + item.getReadValueId().getNodeId().toString() + "}, value={" + value.getValue() + "}, date={" + value.getServerTime().toString() + "}");
+        String message = "subscription value received: item={" + item.getReadValueId().getNodeId().toString() + "}, value={" + value.getValue() + "}, date={" + value.getServerTime().toString() + "}";
+        Logger.getLogger(this.getClass().getName()).info(message);
         NodeId nodeId = item.getReadValueId().getNodeId();
 
         Double val = VariantConverter.convertToDouble(value.getValue());
@@ -40,11 +45,13 @@ public class OpcSubscription implements IOpcSubscription {
 
         Measure measure = new Measure(1l, val, serverTime);
         this.measureService.addMeasure(measure);
+        this.messagePublisher.publishMessage(message);
     }
 
     @Override
     public void onValueArrived(UaMonitoredItem item, DataValue value) {
-        Logger.getLogger(this.getClass().getName()).info("subscription value received: item={" + item.getReadValueId().getNodeId().toString() + "}, value={" + value.getValue() + "}, date={" + value.getServerTime().toString() + "}");
+        String message = "subscription value received: item={" + item.getReadValueId().getNodeId().toString() + "}, value={" + value.getValue() + "}, date={" + value.getServerTime().toString() + "}";
+        Logger.getLogger(this.getClass().getName()).info(message);
         NodeId nodeId = item.getReadValueId().getNodeId();
 
         Double val = VariantConverter.convertToDouble(value.getValue());
@@ -52,5 +59,6 @@ public class OpcSubscription implements IOpcSubscription {
 
         Measure measure = new Measure(1l, val, serverTime);
         this.measureService.addMeasure(measure);
+        this.messagePublisher.publishMessage(message);
     }
 }
